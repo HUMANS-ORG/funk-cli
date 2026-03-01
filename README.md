@@ -1,6 +1,10 @@
-# funk - Your terminal's swiss army knife for weird problems
+<h1 align="center"> funk </h1>
 
-## _Because your terminal  should never be sad place_
+<p  align="center"> 
+    Lightweight suite of useful CLI tools to solve specific annoying problems faced by developers and Linux users alike, written in Go 
+</p>
+
+---
 
 ## What is funk?
 Ever found yourself:
@@ -10,12 +14,14 @@ Ever found yourself:
 * Writing the same TODO list commands over and over?
 
 **funk is here to fix all that!** 
+
 It's a collection of little helpers that live in your terminal and solve those tiny annoying problems that developers and Linux users face every day. Think of it as a multi-tool for people who live in the terminal.
+
 
 ## Who Needs funk?
 
-* *Developers* who spend 80% of their time in terminal (hello, fellow cool kids!).
-* *System Admins* who need quick solutions without writing 50-line scripts.
-* *Terminal Enthusiasts* who think GUIs are overrated.
-* *Ricers of r/unixporn* who are looking for the next cool CLI tool for their thinkpad with Arch(btw). 
+* _**Developers**_ who spend 80% of their time in terminal (hello, fellow cool kids!).
+* _**System Admins**_ who need quick solutions without writing 50-line scripts.
+* _**Terminal Enthusiasts**_ who think GUIs are overrated.
+* _**Ricers of r/unixporn**_ who are looking for the next cool CLI tool for their thinkpad with Arch(btw). 
 
