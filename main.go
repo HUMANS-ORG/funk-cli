@@ -42,6 +42,10 @@ func main() {
 	}
 
 	fmt.Println("name:", demo.name, "age:", demo.age)
+
+	for i :=range(5){
+		fmt.Println(i)
+	}
 }
 func hello(a int, b int) (int, int, error) {
 	var err error
