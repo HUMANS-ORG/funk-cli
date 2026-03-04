@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"funk/commands"
 	"github.com/urfave/cli/v3"
 	"log"
 	"os"
@@ -11,10 +11,9 @@ import (
 func main() {
 	cmd := &cli.Command{
 		Name:  "funk",
-		Usage: "make an explosive entrance",
-		Action: func(context.Context, *cli.Command) error {
-			fmt.Println("boom! I say!")
-			return nil
+		Usage: "suite of useful tools for pesky problems",
+		Commands: []*cli.Command{
+			commands.ConvertCommand(),
 		},
 	}
 
