@@ -11,23 +11,43 @@ func ConvertCommand() *cli.Command {
 		Name:    "convert",
 		Suggest: true,
 		Usage:   "converts various units",
-		Action:  Converto,
-		Flags: []cli.Flag{
+		Action:  Converto, Flags: []cli.Flag{
+			// distance converters.
 			&cli.Float64Flag{
-				Name:  "miles",
-				Usage: "Convert kilometers to Miles",
+				Name:    "miles",
+				Aliases: []string{"m"},
+				Usage:   "Enter values in miles",
 			},
 			&cli.Float64Flag{
-				Name:  "km",
-				Usage: "Convert miles to kilometers",
+				Name:    "km",
+				Aliases: []string{"k"},
+				Usage:   "Enter values in kilometers",
+			},
+			&cli.BoolFlag{
+				Name:    "to-km",
+				Aliases: []string{"tk"},
+				Usage:   "convert to kilometer",
+			},
+			&cli.BoolFlag{
+				Name:    "to-miles",
+				Aliases: []string{"tM"},
+				Usage:   "Convert to miles",
+			},
+			&cli.BoolFlag{
+				Name:    "to-meters",
+				Aliases: []string{"tm"},
+				Usage:   "convert to meters",
+			},
+			// Weight converters
+			&cli.Float64Flag{
+				Name:    "lbs",
+				Aliases: []string{"p"},
+				Usage:   "Convert kilograms to pounds",
 			},
 			&cli.Float64Flag{
-				Name:  "lbs",
-				Usage: "Convert kilograms to pounds",
-			},
-			&cli.Float64Flag{
-				Name:  "kg",
-				Usage: "Convert pounds to kilograms",
+				Name:    "kg",
+				Aliases: []string{"w"},
+				Usage:   "Convert pounds to kilograms",
 			},
 		},
 		//	OnUsageError: ErrorHandle,
@@ -37,30 +57,32 @@ func ConvertCommand() *cli.Command {
 func Converto(ctx context.Context, cmd *cli.Command) error {
 
 	// converts kilometer values to miles and vice versa
+	km := cmd.Float64("km")
+	if cmd.IsSet("km") {
+		if cmd.Bool("to-miles") {
+			miles := km * 0.621371
+			fmt.Printf("\n%.2f km = %.2f miles \n", km, miles)
+		}
+		if cmd.Bool("to-meters") {
+			meters := km * 1000
+			fmt.Printf("\n%.2f km = %.2f meters\n", km, meters)
+		}
+	}
+
+	miles := cmd.Float64("miles")
 	if cmd.IsSet("miles") {
-		km := cmd.Float64("miles")
-		mil := km * 0.6213712
-		fmt.Printf("\n%.2f km = %.2f miles \n", km, mil)
-		return nil
-	} else if cmd.IsSet("km") {
-		miles := cmd.Float64("km")
-		kim := miles / 0.6213712
-		fmt.Printf("%.2f miles = %.2f km \n", miles, kim)
-		return nil
+		if cmd.Bool("to-km") {
+			kim := miles / 0.621371
+			fmt.Printf("\n%.2f miles = %.2f km \n", miles, kim)
+		}
+		if cmd.Bool("to-meters") {
+			meters := miles * 1609.344
+			fmt.Printf("\n%.2f miles = %.2f meters \n", miles, meters)
+		}
 	}
 
 	// Converts kilograms to pounds and vice versa
-	if cmd.IsSet("lbs") {
-		kilogram := cmd.Float64("lbs")
-		pounds := kilogram * 2.20462
-		fmt.Printf("\n%.2f kg = %.2f lbs \n", kilogram, pounds)
-		return nil
-	} else if cmd.IsSet("kg") {
-		pounds := cmd.Float64("kg")
-		kilogram := pounds / 2.20462
-		fmt.Printf("\n%.2f lbs <->  %.2f kg \n", pounds, kilogram)
-		return nil
-	}
+
 	return nil
 
 	// Converts Celsius to Fahrenheit
