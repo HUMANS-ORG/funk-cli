@@ -18,6 +18,7 @@ func main() {
 
 		Commands: []*cli.Command{
 			commands.FileEmptyCommand(),
+			commands.FileRecentCommand(),
 			// commands.ConvertCommand()  <- teammates plug in here
 		},
 	}
