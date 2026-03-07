@@ -3,58 +3,77 @@ package commands
 import (
 	"context"
 	"fmt"
-	"time"
-
+	"os/exec"
 	"github.com/urfave/cli/v3"
 )
 
 func TimerCommand() *cli.Command {
-	return  &cli.Command{
-		Name: "timer",
-		Usage: "detect a particular timer",
+	return &cli.Command{
+		Name:  "timer",
+		Usage: "Set a countdown timer and show Windows toast when done",
 		Action: TimerSet,
 		Flags: []cli.Flag{
 			&cli.IntFlag{
-				Name: "seconds",
-				Usage: "the timer in seconds",
+				Name:  "seconds",
+				Usage: "timer duration in seconds",
 			},
 			&cli.IntFlag{
-				Name: "minutes",
-				Usage: "the timer in minutes",
+				Name:  "minutes",
+				Usage: "timer duration in minutes",
 			},
 			&cli.IntFlag{
-				Name: "hours",
-				Usage: "the timer in hours",
+				Name:  "hours",
+				Usage: "timer duration in hours",
 			},
 		},
 	}
 }
 
-func TimerSet(ctx context.Context,cmd *cli.Command) error  {
+func TimerSet(ctx context.Context, cmd *cli.Command) error {
+
 	var totalSeconds int
 
-	if cmd.IsSet("seconds") {
+
+	switch {
+	case cmd.IsSet("seconds"):
 		totalSeconds = cmd.Int("seconds")
 
-	} else if cmd.IsSet("minutes") {
+	case cmd.IsSet("minutes"):
 		totalSeconds = cmd.Int("minutes") * 60
 
-	} else if cmd.IsSet("hours") {
+	case cmd.IsSet("hours"):
 		totalSeconds = cmd.Int("hours") * 3600
 
-	} else {
-		return fmt.Errorf("please specify --seconds, --minutes, or --hours")
+	default:
+		return fmt.Errorf("please specify one of: --seconds, --minutes, or --hours")
 	}
 
-    fmt.Println("⏳ Timer started")
-
-	for i := totalSeconds; i > 0; i-- {
-		fmt.Printf("Remaining: %d seconds\n", i)
-		time.Sleep(1 * time.Second)
+	if totalSeconds <= 0 {
+		return fmt.Errorf("duration must be positive")
 	}
 
-	fmt.Println("🔔 Time's up!")
+	fmt.Printf("⏳ Timer started — %d seconds\n", totalSeconds)
 
-	return  nil
+	// PowerShell background timer command
+	psCommand := fmt.Sprintf(
+		"Start-Sleep -Seconds %d; Import-Module BurntToast; New-BurntToastNotification -Text '%d Seconds Timer Finished'",
+		totalSeconds,totalSeconds,
+	)
 
+	// run powershell in background
+	cmdExec := exec.Command(
+		"powershell.exe",
+		"-NoProfile",
+		"-Command",
+		psCommand,
+	)
+
+	err := cmdExec.Start()
+	if err != nil {
+		return fmt.Errorf("failed to start timer: %v", err)
+	}
+
+	fmt.Println("✅ Timer running in background")
+
+	return nil
 }
