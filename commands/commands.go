@@ -52,15 +52,15 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("duration must be positive")
 	}
 
-	fmt.Printf("⏳ Timer started — %d seconds\n", totalSeconds)
+	fmt.Printf("Timer started — %d seconds\n", totalSeconds)
 
-	// PowerShell background timer command
+	
 	psCommand := fmt.Sprintf(
 		"Start-Sleep -Seconds %d; Import-Module BurntToast; New-BurntToastNotification -Text '%d Seconds Timer Finished'",
 		totalSeconds,totalSeconds,
 	)
 
-	// run powershell in background
+	
 	cmdExec := exec.Command(
 		"powershell.exe",
 		"-NoProfile",
@@ -73,7 +73,7 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("failed to start timer: %v", err)
 	}
 
-	fmt.Println("✅ Timer running in background")
+	fmt.Println("Timer running in background")
 
 	return nil
 }
