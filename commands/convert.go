@@ -17,13 +17,18 @@ func ConvertCommand() *cli.Command {
 			// distance converters.
 			&cli.Float64Flag{
 				Name:    "miles",
-				Aliases: []string{"m"},
+				Aliases: []string{"M"},
 				Usage:   "Enter values in miles",
 			},
 			&cli.Float64Flag{
 				Name:    "km",
 				Aliases: []string{"k"},
 				Usage:   "Enter values in kilometers",
+			},
+			&cli.Float64Flag{
+				Name:    "m",
+				Aliases: []string{"m"},
+				Usage:   "Enter values in meters",
 			},
 			&cli.BoolFlag{
 				Name:    "to-km",
@@ -36,9 +41,14 @@ func ConvertCommand() *cli.Command {
 				Usage:   "Convert to miles",
 			},
 			&cli.BoolFlag{
-				Name:    "to-meters",
+				Name:    "to-m",
 				Aliases: []string{"tm"},
 				Usage:   "convert to meters",
+			},
+			&cli.BoolFlag{
+				Name:    "to-cm",
+				Aliases: []string{"tc"},
+				Usage:   "convert to centimeters",
 			},
 
 			// Weight converters
@@ -81,7 +91,7 @@ func ConvertCommand() *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:    "to-c",
-				Aliases: []string{"tc"},
+				Aliases: []string{"tC"},
 				Usage:   "Convert fahrenheit to celsius",
 			},
 			&cli.BoolFlag{
@@ -89,6 +99,8 @@ func ConvertCommand() *cli.Command {
 				Aliases: []string{"tf"},
 				Usage:   "Convert celsius to fahrenheit",
 			},
+
+			// Binary to hexadecimal conversion
 			&cli.StringSliceFlag{
 				Name:    "binary",
 				Aliases: []string{"b"},
@@ -96,12 +108,12 @@ func ConvertCommand() *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:    "to-hex",
-				Aliases: []string{"th"},
+				Aliases: []string{"tH"},
 				Usage:   "Convert binary numbers to hexadecimal",
 			},
 			&cli.StringSliceFlag{
 				Name:    "hex",
-				Aliases: []string{"h"},
+				Aliases: []string{"H"},
 				Usage:   "Enter values in hexadecimal",
 			},
 			&cli.BoolFlag{
@@ -116,33 +128,54 @@ func ConvertCommand() *cli.Command {
 
 func Converto(ctx context.Context, cmd *cli.Command) error {
 
-	// converts kilometer values to miles and vice versa
+	// distance conversion
+	m := cmd.Float64("m")
+	if cmd.IsSet("m") {
+		if cmd.Bool("to-km") {
+			km := m / 1000
+			fmt.Printf("\n %.2f m <-> %.2f km \n", m, km)
+		}
+		if cmd.Bool("to-cm") {
+			cm := m * 100
+			fmt.Printf("\n %.2f m <-> %.2f cm \n", m, cm)
+		}
+		if cmd.Bool("to-miles") {
+			miles := m * 0.00062137
+			fmt.Printf("\n %.2f m <-> %.2f miles \n", m, miles)
+		}
+	}
 	km := cmd.Float64("km")
 	if cmd.IsSet("km") {
 		if cmd.Bool("to-miles") {
 			miles := km * 0.621371
 			fmt.Printf("\n %.2f km <-> %.2f miles\n", km, miles)
 		}
-		if cmd.Bool("to-meters") {
+		if cmd.Bool("to-m") {
 			meters := km * 1000
 			fmt.Printf("\n %.2f km <-> %.2f meters\n", km, meters)
 		}
+		if cmd.Bool("to-cm") {
+			cm := km * 100000
+			fmt.Printf("\n %.2f km <-> %.2f centimeters\n", km, cm)
+		}
 	}
-
 	miles := cmd.Float64("miles")
 	if cmd.IsSet("miles") {
 		if cmd.Bool("to-km") {
 			kim := miles / 0.621371
 			fmt.Printf("\n %.2f miles <-> %.2f km\n", miles, kim)
 		}
-		if cmd.Bool("to-meters") {
+		if cmd.Bool("to-m") {
 			meters := miles * 1609.344
 			fmt.Printf("\n %.2f miles <-> %.2f meters\n", miles, meters)
+		}
+		if cmd.Bool("to-cm") {
+			cm := miles * 160934.4
+			fmt.Printf("\n %.2f miles <-> %.2f centimeters\n", miles, cm)
 		}
 	}
 
 	// Weight conversion
-
 	lbs := cmd.Float64("lbs")
 	if cmd.IsSet("lbs") {
 		if cmd.Bool("to-kg") {
@@ -154,7 +187,6 @@ func Converto(ctx context.Context, cmd *cli.Command) error {
 			fmt.Printf("\n %.2f lbs <-> %.2f gm\n", lbs, grams)
 		}
 	}
-
 	kg := cmd.Float64("kg")
 	if cmd.IsSet("kg") {
 		if cmd.Bool("to-lbs") {
@@ -184,6 +216,8 @@ func Converto(ctx context.Context, cmd *cli.Command) error {
 		}
 	}
 
+	// Number system conversion - binary to hexadecimal
+
 	binary := cmd.StringSlice("binary")
 	if cmd.IsSet("binary") {
 		if cmd.Bool("to-hex") {
@@ -201,7 +235,6 @@ func Converto(ctx context.Context, cmd *cli.Command) error {
 		}
 
 	}
-
 	hex := cmd.StringSlice("hex")
 	if cmd.IsSet("hex") {
 		if cmd.Bool("to-binary") {
@@ -215,7 +248,10 @@ func Converto(ctx context.Context, cmd *cli.Command) error {
 				}
 			}
 			fmt.Printf("\n%s\n", binSlice)
+		} else {
+			fmt.Printf("Try -tb?\n")
 		}
+
 	}
 
 	return nil
