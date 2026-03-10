@@ -1,10 +1,14 @@
  package todo
 
-import "funk/database"
+import ("funk/database"
+"fmt"
+)
 
 func InitTable() {
 
 	db := database.ConnectDB()
+
+	fmt.Println(("this is db file"))
 
 	db.Exec(`
 	CREATE TABLE IF NOT EXISTS tasks (
