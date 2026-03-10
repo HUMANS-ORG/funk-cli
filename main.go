@@ -1,4 +1,4 @@
-package main
+ package main
 
 import (
 	"fmt"
@@ -10,16 +10,16 @@ import (
 func main() {
 
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: funk <tool>")
+		fmt.Println("Usage: funk todo")
 		return
 	}
 
 	switch os.Args[1] {
 
 	case "todo":
-		todo.Run(os.Args[2:])
+		todo.InitTable()
 
 	default:
-		fmt.Println("Tool not found")
+		fmt.Println("Command not found")
 	}
 }
