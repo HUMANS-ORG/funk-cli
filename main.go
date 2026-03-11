@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -7,10 +6,7 @@ import (
 	"os"
 	"github.com/urfave/cli/v3"
 	"funk/commands"
-	
 )
-
-
 
 func main()  {
 	cmd := &cli.Command{
@@ -24,6 +20,4 @@ func main()  {
 	if err:=cmd.Run(context.Background(),os.Args); err !=nil {
 		log.Fatal(err)
 	}
-
-	
 }

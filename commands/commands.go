@@ -7,6 +7,7 @@ import (
 	"github.com/urfave/cli/v3"
 	"runtime"
 	"time"
+	"funk/sqldb"
 )
 
 func TimerCommand() *cli.Command {
@@ -52,6 +53,8 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 	if totalSeconds <= 0 {
 		return fmt.Errorf("duration must be positive")
 	}
+
+	sqldb.Create_db()
 	
 	switch runtime.GOOS {
 	case "windows":
