@@ -28,6 +28,10 @@ func TimerCommand() *cli.Command {
 				Name:  "hr",
 				Usage: "timer duration in hours",
 			},
+			&cli.BoolFlag{
+				Name: "his",
+				Usage: "show the timer history",
+			},
 		},
 	}
 }
@@ -35,6 +39,12 @@ func TimerCommand() *cli.Command {
 func TimerSet(ctx context.Context, cmd *cli.Command) error {
 
 	var totalSeconds int
+
+	if cmd.Bool("his"){
+	
+		sqldb.Show_history()
+		return nil
+	}
 
 	switch {
 	case cmd.IsSet("sec"):
@@ -80,18 +90,32 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 	fmt.Println("Timer running in background")
 
 	default:
-		for i := totalSeconds ;i>=0;i-- {
-			h:=i/3600
-			m:= (i%3600)/60
-			s:=i % 60
+		var h int
+		var m int
+		var s int
 
-			fmt.Printf("\r⏳ %02d:%02d:%02d", h, m,s)
+		h,m,s,totalSeconds := timer_cal(h,m,s,totalSeconds)
+
+		sqldb.Insert_data(h,m,s)
+		
+		for i := totalSeconds ;i>=0;i-- {
+			h,m,s,i=timer_cal(h,m,s,i)
+
+			fmt.Printf("\r⏳ %02d:%02d:%02d", h,m,s)
 
 			time.Sleep(time.Second)
 
 		}
+
 		fmt.Println("\ntimer finish")
 	}
 	
 	return nil
 }
+
+func timer_cal(h int,m int,s int,i int) (int,int,int,int) {
+			h =i/3600
+			m = (i%3600)/60
+			s =i % 60
+			return h,m,s,i
+		}
