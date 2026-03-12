@@ -3,17 +3,18 @@ package commands
 import (
 	"context"
 	"fmt"
-	"os/exec"
+	"funk/sqldb"
+	"github.com/nsf/termbox-go"
 	"github.com/urfave/cli/v3"
+	"os/exec"
 	"runtime"
 	"time"
-	"funk/sqldb"
 )
 
 func TimerCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "timer",
-		Usage: "Set a countdown timer and show Windows toast when done",
+		Name:   "timer",
+		Usage:  "Set a countdown timer and show Windows toast when done",
 		Action: TimerSet,
 		Flags: []cli.Flag{
 			&cli.IntFlag{
@@ -29,7 +30,7 @@ func TimerCommand() *cli.Command {
 				Usage: "timer duration in hours",
 			},
 			&cli.BoolFlag{
-				Name: "his",
+				Name:  "his",
 				Usage: "show the timer history",
 			},
 		},
@@ -40,8 +41,8 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 
 	var totalSeconds int
 
-	if cmd.Bool("his"){
-	
+	if cmd.Bool("his") {
+
 		sqldb.Show_history()
 		return nil
 	}
@@ -65,57 +66,98 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	sqldb.Create_db()
-	
+
+	fmt.Println("Timer Start")
+
 	switch runtime.GOOS {
 	case "windows":
 		fmt.Printf("Timer started — %d seconds\n", totalSeconds)
 		psCommand := fmt.Sprintf(
-		"Start-Sleep -Seconds %d; Import-Module BurntToast; New-BurntToastNotification -Text '%d Seconds Timer Finished'",
-		totalSeconds,totalSeconds,
-	)
+			"Start-Sleep -Seconds %d; Import-Module BurntToast; New-BurntToastNotification -Text '%d Seconds Timer Finished'",
+			totalSeconds, totalSeconds,
+		)
 
-	cmdExec := exec.Command(
-		"powershell.exe",
-		"-NoProfile",
-		"-Command",
-		psCommand,
-	)
+		cmdExec := exec.Command(
+			"powershell.exe",
+			"-NoProfile",
+			"-Command",
+			psCommand,
+		)
 
-	err := cmdExec.Start()
+		err := cmdExec.Start()
 
-	if err != nil {
-		return fmt.Errorf("failed to start timer: %v", err)
-	}
+		if err != nil {
+			return fmt.Errorf("failed to start timer: %v", err)
+		}
 
-	fmt.Println("Timer running in background")
+		fmt.Println("Timer running in background")
 
 	default:
+		err_d := termbox.Init()
+
+		if err_d != nil {
+			panic(err_d)
+		}
+
+		defer termbox.Close()
+
+		pause := make(chan bool)
+
+		go func() {
+			for {
+				ev := termbox.PollEvent()
+
+				if ev.Type == termbox.EventKey {
+
+					if ev.Key == termbox.KeyCtrlC {
+						pause <- true
+						return
+					}
+
+					if ev.Ch =='q'{
+						pause <-true
+						return 
+					}
+				}
+			}
+		}()
+
 		var h int
 		var m int
 		var s int
 
-		h,m,s,totalSeconds := timer_cal(h,m,s,totalSeconds)
+		h1, m1, s1 := timer_cal(totalSeconds)
 
-		sqldb.Insert_data(h,m,s)
-		
-		for i := totalSeconds ;i>=0;i-- {
-			h,m,s,i=timer_cal(h,m,s,i)
+		for i := totalSeconds; i >= 0; i-- {
 
-			fmt.Printf("\r⏳ %02d:%02d:%02d", h,m,s)
+			h, m, s = timer_cal(i)
 
-			time.Sleep(time.Second)
+			select {
+			case <-pause:
+				sqldb.Insert_data(h, m, s)
+				fmt.Println("\nTimer stopped")
+				return nil
+
+			default:
+				fmt.Printf("\r⏳ %02d:%02d:%02d", h, m, s)
+				time.Sleep(time.Second)
+
+				if i == 0 {
+					sqldb.Insert_data(h1, m1, s1)
+				}
+			}
 
 		}
 
 		fmt.Println("\ntimer finish")
 	}
-	
+
 	return nil
 }
 
-func timer_cal(h int,m int,s int,i int) (int,int,int,int) {
-			h =i/3600
-			m = (i%3600)/60
-			s =i % 60
-			return h,m,s,i
-		}
+func timer_cal(i int) (int, int, int) {
+	h := i / 3600
+	m := (i % 3600) / 60
+	s := i % 60
+	return h, m, s
+}

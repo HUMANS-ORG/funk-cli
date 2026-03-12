@@ -50,7 +50,7 @@ func Insert_data(h int,m int,s int)  {
 		log.Fatal(err)
 	}
 
-	log.Printf("insert successfully: %02d:%02d:%02d\n", h, m, s)
+	log.Printf("\ninsert timer data in db successfully: %02d:%02d:%02d\n Command 'funk timer --his' ", h, m, s)
 	
 }
 
@@ -73,7 +73,8 @@ func Show_history()  {
 
 		row.Scan(&id,&created,&timer)
 
-		fmt.Printf("%d | %s | %s\n", id, created, timer)
+		fmt.Printf("%d  | %s | %s\n", id, created, timer)
 
 	}
 }
+
