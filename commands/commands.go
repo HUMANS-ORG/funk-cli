@@ -101,7 +101,7 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 
 		defer termbox.Close()
 
-		pause := make(chan bool)
+		control := make(chan string)
 
 		go func() {
 			for {
@@ -109,18 +109,24 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 
 				if ev.Type == termbox.EventKey {
 
-					if ev.Key == termbox.KeyCtrlC {
-						pause <- true
+					if ev.Key == termbox.KeyCtrlC || ev.Ch == 'q' {
+						control <- "stop"
 						return
 					}
 
-					if ev.Ch =='q'{
-						pause <-true
-						return 
+					if ev.Key == termbox.KeySpace {
+						control <- "pause"
+					}
+
+					if ev.Ch == 'r' {
+						control <- "resume"
 					}
 				}
 			}
 		}()
+
+		state := "running"
+		st_timer := totalSeconds
 
 		var h int
 		var m int
@@ -128,21 +134,38 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 
 		h1, m1, s1 := timer_cal(totalSeconds)
 
-		for i := totalSeconds; i >= 0; i-- {
+		for st_timer >= 0 {
 
-			h, m, s = timer_cal(i)
+			h, m, s = timer_cal(st_timer)
 
 			select {
-			case <-pause:
-				sqldb.Insert_data(h, m, s)
-				fmt.Println("\nTimer stopped")
-				return nil
+
+			case con := <-control:
+				if con == "stop" {
+					sqldb.Insert_data(h, m, s)
+					fmt.Println("\nTimer stopped")
+					return nil
+				}
+
+				if con == "pause" {
+					state = "pause"
+				}
+
+				if con == "resume" {
+					state = "running"
+				}
 
 			default:
-				fmt.Printf("\r⏳ %02d:%02d:%02d", h, m, s)
+				if state == "pause" {
+					fmt.Printf("\r⏸ %02d:%02d:%02d", h, m, s)
+				} else {
+					fmt.Printf("\r⏳ %02d:%02d:%02d", h, m, s)
+					st_timer--
+
+				}
 				time.Sleep(time.Second)
 
-				if i == 0 {
+				if st_timer < 0 {
 					sqldb.Insert_data(h1, m1, s1)
 				}
 			}
