@@ -17,9 +17,7 @@ func main() {
 		Usage: "Developer CLI tool",
 
 		Commands: []*cli.Command{
-			commands.FileEmptyCommand(),
-			commands.FileRecentCommand(),
-			commands.FileLargeCommand(),
+			commands.FileDetectCommand(),
 			// commands.ConvertCommand()  <- teammates plug in here
 		},
 	}
