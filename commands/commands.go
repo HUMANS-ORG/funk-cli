@@ -20,10 +20,12 @@ func TimerCommand() *cli.Command {
 			&cli.IntFlag{
 				Name:  "sec",
 				Usage: "timer duration in seconds",
+				Aliases: []string{"s"},
 			},
 			&cli.IntFlag{
 				Name:  "min",
 				Usage: "timer duration in minutes",
+				Aliases: []string{"m"},
 			},
 			&cli.IntFlag{
 				Name:  "hr",
@@ -33,8 +35,106 @@ func TimerCommand() *cli.Command {
 				Name:  "his",
 				Usage: "show the timer history",
 			},
+			&cli.IntFlag{
+				Name: "del",
+				Usage: "use to delete the timer record",
+				Aliases: []string{"d","rm"},
+			},
 		},
 	}
+}
+
+var digits = map[rune][]string{
+	'0': {
+		" ███ ",
+		"█   █",
+		"█   █",
+		"█   █",
+		" ███ ",
+	},
+	'1': {
+		"  █  ",
+		" ██  ",
+		"  █  ",
+		"  █  ",
+		"█████",
+	},
+	'2': {
+		"████ ",
+		"    █",
+		" ███ ",
+		"█    ",
+		"█████",
+	},
+	'3': {
+		"████ ",
+		"    █",
+		" ███ ",
+		"    █",
+		"████ ",
+	},
+	'4': {
+		"█  █ ",
+		"█  █ ",
+		"█████",
+		"   █ ",
+		"   █ ",
+	},
+	'5': {
+		"█████",
+		"█    ",
+		"████ ",
+		"    █",
+		"████ ",
+	},
+	'6': {
+		" ███ ",
+		"█    ",
+		"████ ",
+		"█   █",
+		" ███ ",
+	},
+	'7': {
+		"█████",
+		"    █",
+		"   █ ",
+		"  █  ",
+		"  █  ",
+	},
+	'8': {
+		" ███ ",
+		"█   █",
+		" ███ ",
+		"█   █",
+		" ███ ",
+	},
+	'9': {
+		" ███ ",
+		"█   █",
+		" ████",
+		"    █",
+		" ███ ",
+	},
+	':': {
+		"     ",
+		"  █  ",
+		"     ",
+		"  █  ",
+		"     ",
+	},
+}
+
+func print_timer(t string) {
+	for row := 0; row < 5; row++ {
+		for _, ch := range t {
+			fmt.Print(digits[ch][row], " ")
+		}
+		fmt.Println()
+	}
+}
+
+func clearScreen() {
+	fmt.Print("\033[H\033[2J")
 }
 
 func TimerSet(ctx context.Context, cmd *cli.Command) error {
@@ -42,7 +142,6 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 	var totalSeconds int
 
 	if cmd.Bool("his") {
-
 		sqldb.Show_history()
 		return nil
 	}
@@ -56,6 +155,12 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 
 	case cmd.IsSet("hr"):
 		totalSeconds = cmd.Int("hr") * 3600
+
+	case cmd.IsSet("del"):
+		index :=cmd.Int("del")
+		sqldb.Delete_Record(index)
+		return nil
+
 
 	default:
 		return fmt.Errorf("please specify one of: --sec, --min, or --hr")
@@ -72,6 +177,7 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 	switch runtime.GOOS {
 	case "windows":
 		fmt.Printf("Timer started — %d seconds\n", totalSeconds)
+
 		psCommand := fmt.Sprintf(
 			"Start-Sleep -Seconds %d; Import-Module BurntToast; New-BurntToastNotification -Text '%d Seconds Timer Finished'",
 			totalSeconds, totalSeconds,
@@ -103,33 +209,33 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 
 		control := make(chan string)
 
+		state := "resume"
+
 		go func() {
 			for {
 				ev := termbox.PollEvent()
-
 				if ev.Type == termbox.EventKey {
-
 					if ev.Key == termbox.KeyCtrlC || ev.Ch == 'q' {
 						control <- "stop"
 						return
 					}
-
 					if ev.Key == termbox.KeySpace {
-						control <- "pause"
-					}
-
-					if ev.Ch == 'r' {
-						control <- "resume"
+						if state == "resume" {
+							control <- "pause"
+						} else {
+							control <- "resume"
+						}
 					}
 				}
 			}
 		}()
 
-		state := "running"
 		st_timer := totalSeconds
 
 		var h int
+
 		var m int
+
 		var s int
 
 		h1, m1, s1 := timer_cal(totalSeconds)
@@ -139,39 +245,34 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 			h, m, s = timer_cal(st_timer)
 
 			select {
-
 			case con := <-control:
 				if con == "stop" {
 					sqldb.Insert_data(h, m, s)
 					fmt.Println("\nTimer stopped")
 					return nil
 				}
-
 				if con == "pause" {
 					state = "pause"
 				}
-
 				if con == "resume" {
-					state = "running"
+					state = "resume"
 				}
 
 			default:
+				a := fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 				if state == "pause" {
-					fmt.Printf("\r⏸ %02d:%02d:%02d", h, m, s)
-				} else {
-					fmt.Printf("\r⏳ %02d:%02d:%02d", h, m, s)
+					clearScreen()
+				} else if state == "resume" {
+					clearScreen()
 					st_timer--
-
 				}
+				print_timer(a)
 				time.Sleep(time.Second)
-
 				if st_timer < 0 {
 					sqldb.Insert_data(h1, m1, s1)
 				}
 			}
-
 		}
-
 		fmt.Println("\ntimer finish")
 	}
 
