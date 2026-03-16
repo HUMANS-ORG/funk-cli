@@ -6,19 +6,20 @@ import (
 	"github.com/urfave/cli/v3"
 	"log"
 	"os"
+	"funk/commands"
 )
 
 func main() {
 	cmd := &cli.Command{
 		Name:  "funk",
-		Usage: "make an explosive entrance",
-		Action: func(context.Context, *cli.Command) error {
-			fmt.Println("boom! I say!")
-			return nil
+		Usage: "suite of useful tools for pesky problems",
+		Commands: []*cli.Command{
+			commands.TimerCommand(),
 		},
 	}
 
-	if err := cmd.Run(context.Background(), os.Args); err != nil {
+	if err:=cmd.Run(context.Background(),os.Args); err !=nil {
 		log.Fatal(err)
 	}
 }
+
