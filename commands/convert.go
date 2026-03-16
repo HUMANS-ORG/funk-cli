@@ -13,7 +13,8 @@ func ConvertCommand() *cli.Command {
 		Name:    "conv",
 		Suggest: true,
 		Usage:   "converts various units",
-		Action:  Converto, Flags: []cli.Flag{
+		Action:  Converto,
+		Flags: []cli.Flag{
 			// distance converters.
 			&cli.Float64Flag{
 				Name:    "miles",
@@ -129,19 +130,19 @@ func ConvertCommand() *cli.Command {
 func Converto(ctx context.Context, cmd *cli.Command) error {
 
 	// distance conversion
-	m := cmd.Float64("m")
+	meters := cmd.Float64("m")
 	if cmd.IsSet("m") {
 		if cmd.Bool("to-km") {
-			km := m / 1000
-			fmt.Printf("\n %.2f m <-> %.2f km \n", m, km)
+			km := meters / 1000
+			fmt.Printf("\n %.2f m <-> %.2f km \n", meters, km)
 		}
 		if cmd.Bool("to-cm") {
-			cm := m * 100
-			fmt.Printf("\n %.2f m <-> %.2f cm \n", m, cm)
+			cm := meters * 100
+			fmt.Printf("\n %.2f m <-> %.2f cm \n", meters, cm)
 		}
 		if cmd.Bool("to-miles") {
-			miles := m * 0.00062137
-			fmt.Printf("\n %.2f m <-> %.2f miles \n", m, miles)
+			miles := meters * 0.00062137
+			fmt.Printf("\n %.2f m <-> %.2f miles \n", meters, miles)
 		}
 	}
 	km := cmd.Float64("km")
@@ -228,9 +229,7 @@ func Converto(ctx context.Context, cmd *cli.Command) error {
 					fmt.Printf("%s (binary) = %s (hex) \n", binstr, hexstr)
 					hexSlice = append(hexSlice, hexstr)
 				}
-
 			}
-
 			fmt.Printf("\n%s \n", hexSlice)
 		}
 
@@ -255,5 +254,4 @@ func Converto(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	return nil
-
 }
