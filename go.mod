@@ -7,23 +7,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.34
 	github.com/nsf/termbox-go v1.1.1
 	github.com/urfave/cli/v3 v3.7.0
-<<<<<<< HEAD
-<<<<<<< HEAD
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/mattn/go-runewidth v0.0.21 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 )
-=======
-=======
->>>>>>> main
-)
-
-require (
-	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/mattn/go-runewidth v0.0.21 // indirect
-	github.com/rivo/uniseg v0.4.7 // indirect
-) 
-<<<<<<< HEAD
->>>>>>> main
-=======
->>>>>>> main

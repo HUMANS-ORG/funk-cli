@@ -6,7 +6,6 @@ import (
 	"github.com/urfave/cli/v3"
 	"log"
 	"os"
-	"funk/commands"
 )
 
 func main() {
@@ -14,19 +13,12 @@ func main() {
 		Name:  "funk",
 		Usage: "suite of useful tools for pesky problems",
 		Commands: []*cli.Command{
-<<<<<<< HEAD
-<<<<<<< HEAD
 			commands.ConvertCommand(),
-=======
->>>>>>> main
-=======
->>>>>>> main
 			commands.TimerCommand(),
 		},
 	}
 
-	if err:=cmd.Run(context.Background(),os.Args); err !=nil {
+	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
-
