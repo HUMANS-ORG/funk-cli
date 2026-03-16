@@ -15,7 +15,10 @@ func main() {
 		Usage: "suite of useful tools for pesky problems",
 		Commands: []*cli.Command{
 <<<<<<< HEAD
+<<<<<<< HEAD
 			commands.ConvertCommand(),
+=======
+>>>>>>> main
 =======
 >>>>>>> main
 			commands.TimerCommand(),
