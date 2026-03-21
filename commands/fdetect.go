@@ -18,7 +18,6 @@ import (
 // ── COLORS ───────────────────────────────────────────────────
 var (
 	colorCyan   = color.New(color.FgCyan, color.Bold)
-	colorGreen  = color.New(color.FgGreen)
 	colorYellow = color.New(color.FgYellow)
 )
 
@@ -35,29 +34,6 @@ func termWidth() int {
 }
 
 // ── BANNER ───────────────────────────────────────────────────
-func printBanner() {
-	w := termWidth()
-	inner := w - 2
-
-	top := "╔" + strings.Repeat("═", inner) + "╗"
-	bottom := "╚" + strings.Repeat("═", inner) + "╝"
-
-	title := "FUNK - FILE DETECTIVE"
-	subtitle := "Scan. Detect. Know your files."
-
-	titlePad := strings.Repeat(" ", (inner-len(title))/2)
-	subtitlePad := strings.Repeat(" ", (inner-len(subtitle))/2)
-
-	titleLine := "║" + titlePad + title + strings.Repeat(" ", inner-len(titlePad)-len(title)) + "║"
-	subtitleLine := "║" + subtitlePad + subtitle + strings.Repeat(" ", inner-len(subtitlePad)-len(subtitle)) + "║"
-
-	colorCyan.Println(top)
-	colorCyan.Println(titleLine)
-	colorCyan.Println(subtitleLine)
-	colorCyan.Println(bottom)
-	fmt.Println()
-}
-
 // ── SECTION HEADER ───────────────────────────────────────────
 func printSection(icon, title string) {
 	w := termWidth()
@@ -110,7 +86,6 @@ func FileDetectCommand() *cli.Command {
 
 func runDetect(ctx context.Context, c *cli.Command) error {
 
-	start := time.Now()
 	path := c.String("p")
 
 	// PATH VALIDATION
@@ -119,15 +94,6 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 		return nil
 	}
 
-	printBanner()
-	colorGreen.Println("✔ Ready to scan...\n")
-
-	// scan info
-	infoTable := newTable([]string{"PROPERTY", "VALUE"})
-	infoTable.Append([]string{"Scan Path", path})
-	infoTable.Append([]string{"Scan Time", time.Now().Format("2006-01-02 15:04:05")})
-	infoTable.Render()
-
 	// no flag check
 	if !c.Bool("emt") && !c.Bool("ext") && !c.Bool("dup") && !c.Bool("log") &&
 		c.Int("rec") == 0 && c.Float64("lrg") == 0 && c.Int("top") == 0 {
@@ -135,12 +101,6 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 		colorYellow.Println("  ⚠  No flag provided. Use --help to see all available flags.")
 		return nil
 	}
-
-	type summaryEntry struct {
-		flag  string
-		count int
-	}
-	var summary []summaryEntry
 
 	// ── EMPTY FILES ──────────────────────────────────────────────
 	if c.Bool("emt") {
@@ -169,7 +129,6 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 			table.Render()
 		}
 		printDivider()
-		summary = append(summary, summaryEntry{"--emt", count})
 	}
 
 	// ── RECENT FILES ─────────────────────────────────────────────
@@ -206,7 +165,6 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 			table.Render()
 		}
 		printDivider()
-		summary = append(summary, summaryEntry{fmt.Sprintf("--rec (%d days)", days), count})
 	}
 
 	// ── LARGE FILES ──────────────────────────────────────────────
@@ -243,7 +201,6 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 			table.Render()
 		}
 		printDivider()
-		summary = append(summary, summaryEntry{"--lrg", count})
 	}
 
 	// ── TOP FILES ────────────────────────────────────────────────
@@ -292,7 +249,6 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 			table.Render()
 		}
 		printDivider()
-		summary = append(summary, summaryEntry{"--top", n})
 	}
 
 	// ── EXTENSIONS ───────────────────────────────────────────────
@@ -323,7 +279,6 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 			table.Render()
 		}
 		printDivider()
-		summary = append(summary, summaryEntry{"--ext", len(extMap)})
 	}
 
 	// ── DUPLICATES ───────────────────────────────────────────────
@@ -354,7 +309,6 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 			table.Render()
 		}
 		printDivider()
-		summary = append(summary, summaryEntry{"--dup", count})
 	}
 
 	// ── LOG FILES ────────────────────────────────────────────────
@@ -380,20 +334,7 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 			table.Render()
 		}
 		printDivider()
-		summary = append(summary, summaryEntry{"--log", count})
 	}
-
-	// ── SCAN SUMMARY ─────────────────────────────────────────────
-	fmt.Println()
-	colorCyan.Println("SCAN SUMMARY")
-	table := newTable([]string{"FLAG", "COUNT"})
-	for _, s := range summary {
-		table.Append([]string{s.flag, fmt.Sprintf("%d", s.count)})
-	}
-	table.Render()
-
-	colorGreen.Printf("\n⏱ Completed in %s\n", time.Since(start))
-	fmt.Println()
 
 	return nil
 }

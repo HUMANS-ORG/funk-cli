@@ -18,7 +18,6 @@ func main() {
 
 		Commands: []*cli.Command{
 			commands.FileDetectCommand(),
-			// commands.ConvertCommand()  <- teammates plug in here
 		},
 	}
 
