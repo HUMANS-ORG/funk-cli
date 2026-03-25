@@ -15,13 +15,13 @@ import (
 	"golang.org/x/term"
 )
 
-// ── COLORS ───────────────────────────────────────────────────
+// COLORS
 var (
 	colorCyan   = color.New(color.FgCyan, color.Bold)
 	colorYellow = color.New(color.FgYellow)
 )
 
-// ── TERMINAL WIDTH ───────────────────────────────────────────
+// TERMINAL WIDTH
 func termWidth() int {
 	width, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil || width < 40 {
@@ -33,8 +33,7 @@ func termWidth() int {
 	return width
 }
 
-// ── BANNER ───────────────────────────────────────────────────
-// ── SECTION HEADER ───────────────────────────────────────────
+// SECTION HEADER
 func printSection(icon, title string) {
 	w := termWidth()
 	dashes := w - len(icon) - len(title) - 6
@@ -45,17 +44,17 @@ func printSection(icon, title string) {
 	colorCyan.Printf("┌─ %s %s %s\n\n", icon, title, strings.Repeat("─", dashes))
 }
 
-// ── DIVIDER ──────────────────────────────────────────────────
+// DIVIDER
 func printDivider() {
 	colorCyan.Println("└" + strings.Repeat("─", termWidth()-1))
 }
 
-// ── NO RESULT ────────────────────────────────────────────────
+// NO RESULT
 func noResult(msg string) {
 	colorYellow.Println("  ⚠  " + msg)
 }
 
-// ── TABLE HELPER ─────────────────────────────────────────────
+// TABLE HELPER
 func newTable(headers []string) *tablewriter.Table {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(headers)
@@ -68,7 +67,7 @@ func newTable(headers []string) *tablewriter.Table {
 
 func FileDetectCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "fdetect",
+		Name:  "sift",
 		Usage: "Detect and scan files with various filters",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{Name: "emt", Aliases: []string{"e"}, Usage: "Find empty files"},
@@ -102,7 +101,7 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 		return nil
 	}
 
-	// ── EMPTY FILES ──────────────────────────────────────────────
+	// EMPTY FILES
 	if c.Bool("emt") {
 		printSection("🔍", "Empty Files")
 		table := newTable([]string{"#", "FILE"})
@@ -131,7 +130,7 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 		printDivider()
 	}
 
-	// ── RECENT FILES ─────────────────────────────────────────────
+	// RECENT FILES
 	if c.Int("rec") > 0 {
 		days := c.Int("rec")
 		cutoff := time.Now().AddDate(0, 0, -days)
@@ -167,7 +166,7 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 		printDivider()
 	}
 
-	// ── LARGE FILES ──────────────────────────────────────────────
+	// LARGE FILES
 	if c.Float64("lrg") > 0 {
 		sizeGB := c.Float64("lrg")
 		minBytes := int64(sizeGB * 1024 * 1024 * 1024)
@@ -203,7 +202,7 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 		printDivider()
 	}
 
-	// ── TOP FILES ────────────────────────────────────────────────
+	// TOP FILES
 	if c.Int("top") > 0 {
 		n := c.Int("top")
 
@@ -251,7 +250,7 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 		printDivider()
 	}
 
-	// ── EXTENSIONS ───────────────────────────────────────────────
+	// EXTENSIONS
 	if c.Bool("ext") {
 		printSection("📋", "Extensions")
 		extMap := make(map[string]int)
@@ -281,7 +280,7 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 		printDivider()
 	}
 
-	// ── DUPLICATES ───────────────────────────────────────────────
+	// DUPLICATES
 	if c.Bool("dup") {
 		printSection("♊", "Duplicates")
 		nameMap := make(map[string][]string)
@@ -311,7 +310,7 @@ func runDetect(ctx context.Context, c *cli.Command) error {
 		printDivider()
 	}
 
-	// ── LOG FILES ────────────────────────────────────────────────
+	// LOG FILES
 	if c.Bool("log") {
 		printSection("📄", "Log Files")
 		table := newTable([]string{"FILE"})
