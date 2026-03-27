@@ -7,7 +7,9 @@ require (
 	github.com/fatih/color v1.19.0
 	github.com/mattn/go-sqlite3 v1.14.34
 	github.com/nsf/termbox-go v1.1.1
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/urfave/cli/v3 v3.7.0
+	golang.org/x/term v0.41.0
 )
 
 require (
@@ -16,5 +18,4 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.21 // indirect
 	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/term v0.41.0
 )

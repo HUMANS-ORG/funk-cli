@@ -16,6 +16,8 @@ func main() {
 			commands.ConvertCommand(),
 			commands.TimerCommand(),
 			commands.Todos(),
+			commands.Isps(),
+			commands.FileDetectCommand(),
 		},
 	}
 
