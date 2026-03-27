@@ -17,6 +17,7 @@ func main() {
 			commands.TimerCommand(),
 			commands.Todos(),
 			commands.Isps(),
+			commands.FileDetectCommand(),
 		},
 	}
 
