@@ -17,7 +17,6 @@ import (
 )
 
 var colorSuccess = color.New(color.FgGreen)
-var colorSuccesss = color.New(color.FgGreen)
 
 func TimerCommand() *cli.Command {
 	return &cli.Command{
@@ -285,7 +284,8 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 					if ev.Key == termbox.KeyCtrlC || ev.Ch == 'q' {
 						control <- "stop"
 						fmt.Println("timer stop")
-						colorSuccesss.Println("insert timer data in db successfully \nCommand 'funk timer --his' ")
+						colorSuccess = color.New(color.FgGreen)
+						colorSuccess.Println("insert timer data in db successfully \nCommand 'funk timer --his' ")
 						return
 					}
 					if ev.Key == termbox.KeySpace {
@@ -316,7 +316,6 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 			select {
 			case con := <-control:
 				if con == "stop" {
-
 					save_timer(h, m, s, task)
 					return nil
 				}
@@ -345,7 +344,8 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 			}
 		}
 		fmt.Println("\ntimer finish")
-		colorSuccesss.Println("insert timer data in db successfully \nCommand 'funk timer --his' ")
+		colorSuccess = color.New(color.FgGreen)
+		colorSuccess.Println("insert timer data in db successfully \nCommand 'funk timer --his' ")
 	}
 	return nil
 }
@@ -353,7 +353,6 @@ func TimerSet(ctx context.Context, cmd *cli.Command) error {
 func save_timer(h int, m int, s int, task string) {
 	termbox.Close()
 	sqldb.Insert_data(h, m, s, task)
-
 }
 
 func timer_cal(i int) (int, int, int) {

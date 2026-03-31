@@ -21,6 +21,8 @@ var (
 	colorYellow = color.New(color.FgYellow)
 )
 
+
+
 // TERMINAL WIDTH
 func termWidth() int {
 	width, _, err := term.GetSize(int(os.Stdout.Fd()))
