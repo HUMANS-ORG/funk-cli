@@ -7,7 +7,6 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-
 func Todos() *cli.Command {
 	return &cli.Command{
 		Name:   "todo",
@@ -65,7 +64,6 @@ func Task(ctx context.Context, cmd *cli.Command) error {
 			fmt.Println("complete the task and afterwards update")
 		}
 		
-
 	default:
 		return fmt.Errorf("please specify one of: --add, --del, or --task")
 	}

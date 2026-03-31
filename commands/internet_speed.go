@@ -15,6 +15,8 @@ import (
 var colorSucces = color.New(color.BgCyan)
 var colorYellows = color.New(color.FgYellow)
 
+
+
 func Isps() *cli.Command {
 	return &cli.Command{
 		Name:    "internet_speed",

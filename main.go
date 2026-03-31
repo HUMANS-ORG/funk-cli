@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"strings"
-
 	"github.com/urfave/cli/v3"
 )
 
@@ -23,6 +22,7 @@ func main() {
 			commands.FileDetectCommand(),
 			commands.Morph(),
 		},
+		
 		OnUsageError: func(ctx context.Context, cmd *cli.Command, err error, isSubcommand bool) error {
 			if strings.Contains(err.Error(), "invalid value") {
 				fmt.Println("❌ Invalid input: seconds must be an integer (e.g., --s 10)")

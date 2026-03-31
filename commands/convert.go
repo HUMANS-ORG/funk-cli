@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+
 func ConvertCommand() *cli.Command {
 	return &cli.Command{
 		Name:    "conv",
